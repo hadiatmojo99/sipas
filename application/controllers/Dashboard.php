@@ -6,7 +6,7 @@ class Dashboard extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->helper(array('html','url','form'));
-        $this->load->library('pagination','form_validation','encryption');
+        $this->load->library('pagination','form_validation','encryption','excel');
 		$this->load->model('M_sipas');
 		if ($this->session->userdata('username') == NULL) {
 			redirect('auth/halaman_kosong');
@@ -726,6 +726,43 @@ class Dashboard extends CI_Controller {
 			$data['jml_keluar'] = $this->M_sipas->laporan_jmlkeluar($tgl_awal, $tgl_akhir);
 			$data['bulan'] = $tgl_awal;
 			$this->load->view('v_proses_laporkeluar', $data);
+		}
+	}
+
+	public function import_excel(){
+		require_once( APPPATH . 'libraries/PHPExcel-1.8/Classes/PHPExcel.php');
+		if (isset($_FILES["fileExcel"]["name"])) {
+			$path = $_FILES["fileExcel"]["tmp_name"];
+			$object = PHPExcel_IOFactory::load($path);
+			foreach($object->getWorksheetIterator() as $worksheet)
+			{
+				$highestRow = $worksheet->getHighestRow();
+				$highestColumn = $worksheet->getHighestColumn();	
+				for($row=2; $row<=$highestRow; $row++)
+				{
+					$tujuan_keluar = $worksheet->getCellByColumnAndRow(1, $row)->getValue();
+					$tgl_keluar = $worksheet->getCellByColumnAndRow(2, $row)->getValue();
+					$nomor_keluar = $worksheet->getCellByColumnAndRow(3, $row)->getValue();
+					$keterangan_keluar = $worksheet->getCellByColumnAndRow(4, $row)->getValue();
+					$temp_data[] = array(
+						'tujuan_keluar'	=> $tujuan_keluar,
+						'tgl_keluar'	=> $tgl_keluar,
+						'nomor_keluar'	=> $nomor_keluar,
+						'keterangan_keluar'	=> $keterangan_keluar
+					); 	
+				}
+			}
+			$this->load->model('M_sipas');
+			$insert = $this->M_sipas->import_surat_keluar($temp_data);
+			if($insert){
+				$this->session->set_flashdata('status', '<span class="glyphicon glyphicon-ok"></span> Data Berhasil di Import ke Database');
+				redirect($_SERVER['HTTP_REFERER']);
+			}else{
+				$this->session->set_flashdata('status', '<span class="glyphicon glyphicon-remove"></span> Terjadi Kesalahan');
+				redirect($_SERVER['HTTP_REFERER']);
+			}
+		}else{
+			echo "Tidak ada file yang masuk";
 		}
 	}
 }

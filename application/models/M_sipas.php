@@ -184,4 +184,15 @@ class M_sipas extends CI_model {
         $this->db->where('tgl_keluar <=',$tgl_akhir);  
 		return $this->db->count_all_results();
 	}
+
+	public function import_surat_keluar($data){
+		$insert = $this->db->insert_batch('surat_keluar', $data);
+		if($insert){
+			return true;
+		}
+	}
+	public function getData(){
+		$this->db->select('*');
+		return $this->db->get('surat_keluar')->result_array();
+	}
 }

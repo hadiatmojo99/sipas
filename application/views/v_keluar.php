@@ -31,6 +31,9 @@
 										<div class="form-group">
 											<a href="<?= base_url('dashboard/tambah_keluar')?>" class="btn btn-primary">Tambah
 												Data</a>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ImportExcel">
+  Import Excel
+</button>
                         <!-- <a href="<?= base_url('dashboard/bersihkan_keluar')?>" class="btn btn-danger">Kosongkan Tabel</a>											 -->
 										</div>
 									</div>
@@ -94,14 +97,38 @@
 			</div>
 	</section>
 </div>
-<!-- DataTables -->
-<script type="text/javascript">
-	$(document).ready(function(){
-		$('#data_user').DataTable({
-      "order": [[ 0, "asc" ]]
-    });
-	});
-</script>
+<!-- Button trigger modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="ImportExcel" tabindex="-1" role="dialog" aria-labelledby="ImportExcelTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ImportExcel">Import Excel</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <form action="<?= base_url('dashboard/import_excel') ?>" enctype="multipart/form-data"
+								role="form" method="post">
+      <label for="#">Upload Surat</label>
+								<div class="input-group mb-3">
+									<div class="custom-file">
+										<input type="file" class="custom-file-input" id="fileExcel" name="fileExcel" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+										<label class="custom-file-label" for="fileExcel">Choose file</label>
+									</div>
+									
+								</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Simpan</button>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 
  <!-- /.card -->
@@ -178,4 +205,11 @@
         } );
     } ).draw();
 } );
+</script>
+<script>
+// Add the following code if you want the name of the file appear on select
+$(".custom-file-input").on("change", function() {
+  var fileName = $(this).val().split("\\").pop();
+  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+});
 </script>
